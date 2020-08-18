@@ -23,7 +23,7 @@ module.exports = override(
   addLessLoader({
     javascriptEnabled: true,
     modifyVars: {
-      "@primary-color": "#1DA57A",
+      "@primary-color": "pink",
     },
   }),
   // 添加装饰器语法
