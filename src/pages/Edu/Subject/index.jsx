@@ -1,9 +1,14 @@
 import React, { Component } from "react";
-import { Button, message } from "antd";
+import { Button, message, Modal } from "antd";
 import { PlusOutlined, FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Table, Tooltip, Input } from "antd";
 import { connect } from "react-redux";
-import { getSubjectList, updateSubjectList, getSecSubjectList } from "./redux";
+import {
+  getSubjectList,
+  updateSubjectList,
+  getSecSubjectList,
+  delSubjectList,
+} from "./redux";
 import { reqUpdateSubject } from "@api/edu/subject";
 import './index.less'
 const data = [
@@ -43,7 +48,8 @@ const data = [
 @connect((state) => ({ subjectList: state.subjectList }), {
   getSubjectList,
   updateSubjectList,
-  getSecSubjectList
+  getSecSubjectList,
+  delSubjectList
 })
 class Subject extends Component {
   page = 1;
@@ -110,11 +116,28 @@ class Subject extends Component {
   handleShowSizeChange = (page, pageSize) => {
     this.props.getSubjectList(page, pageSize);
   };
-
+  //点击扩展的回调函数
   handleExpand = (expanded, record) => {
     if (expanded) {
-      this.props.getSecSubjectList(record._id)
+      this.props.getSecSubjectList(record._id);
     }
+  };
+  //删除的回调
+  handleDel = (record) => () => {
+    Modal.confirm({
+      title: (<>你确定要删除<span style={{ color: 'red', margin: '0 10px' }}>{record.title}</span>吗？</>),
+      onOk: async () => {
+        await this.props.delSubjectList(record._id)
+        message.success('删除成功')
+        if (record.parentId === '0') {
+          if (this.page > 1 && this.props.subjectList.items.length <= 0 && record._id === '0') {
+            this.props.getSubjectList(--this.page, 5)
+            return
+          }
+          this.props.getSubjectList(this.page,5)
+        }
+      }
+    })
   };
   render() {
     const columns = [
@@ -180,6 +203,7 @@ class Subject extends Component {
                     type="danger"
                     size="large"
                     style={{ width: 40 }}
+                    onClick={this.handleDel(record)}
                   ></Button>
                 </Tooltip>
               </>
@@ -191,7 +215,12 @@ class Subject extends Component {
     ];
     return (
       <div className="subject">
-        <Button type="primary" className="subject-btn" icon={<PlusOutlined />} onClick={this.handleAdd}>
+        <Button
+          type="primary"
+          className="subject-btn"
+          icon={<PlusOutlined />}
+          onClick={this.handleAdd}
+        >
           新建
         </Button>
         <Table

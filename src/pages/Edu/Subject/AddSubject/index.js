@@ -23,7 +23,7 @@ const layout = {
   // antd把一个宽度分为24份
   // 表单文字描述部分
   labelCol: {
-    span: 3
+    span: 2
   },
   // 表单项部分
   wrapperCol: {
@@ -56,12 +56,13 @@ export default class index extends Component {
     })
   }
   onFinish = async (value) => {
+    console.log(value)
     await reqAddSubject(value.subjectname, value.parentid)
     message.success('添加成功')
     this.props.history.push('/edu/subject/list')
   }
   render() {
-    console.log(this.state)
+    // console.log(this.state)
     return (
       <Card
       title={
@@ -113,7 +114,7 @@ export default class index extends Component {
                 </div>
               )
           }}>
-              <Option  value={1}>
+              <Option  value={0} key={0}>
                 {'一级菜单'}
               </Option>
               {this.state.items.map(item =><Option  value={item._id} key={item._id}>
