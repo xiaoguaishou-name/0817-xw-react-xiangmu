@@ -70,7 +70,7 @@ export default class index extends Component {
           <Link to='/edu/subject/list'>
             <ArrowLeftOutlined />
           </Link>
-          <span className='title'>新增课程</span>
+          <span className='title' style={{marginLeft:10}}>新增课程</span>
         </>
       }
     >

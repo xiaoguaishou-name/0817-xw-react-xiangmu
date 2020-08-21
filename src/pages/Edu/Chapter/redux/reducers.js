@@ -27,7 +27,7 @@ export default function chapterList(prevState=initChapter,action){
             })
             return{
                 ...prevState,
-
+                chapterList:newChapterList
             }
         default:
             return prevState    

@@ -242,6 +242,7 @@ class Subject extends Component {
             defaultPageSize: 5,
             onChange: this.handleChange,
             onShowSizeChange: this.handleShowSizeChange,
+            current: this.page,
           }}
         />
       </div>
