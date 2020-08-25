@@ -10,6 +10,9 @@ import {reqUploadToken} from '@api/edu/lesson'
 export default class MyUpload extends Component {
   constructor(){
     super()
+    this.state = {
+      isUpload:true
+    }
     const jsonStr = localStorage.getItem('uploadToken')
     if(jsonStr){
       this.tokenObj = JSON.parse(jsonStr)
@@ -53,6 +56,9 @@ export default class MyUpload extends Component {
         //在这里调用form.item传过来的onchange事件就可以解决表单验证不通过的bug
         console.log(this.props)
         this.props.onChange('http://qfekzkjt3.hn-bkt.clouddn.com/' + res.key)
+        this.setState({
+          isUpload:false
+        })
       }
     }
     const key = nanoid(10)
@@ -73,16 +79,20 @@ export default class MyUpload extends Component {
   }
   onRemove = () =>{
     this.props.onChange('')
+    this.setState({
+      isUpload:true
+    })
   }
   render() {
     return (
       <Upload 
       beforeUpload={this.beforeUpload} 
       customRequest={this.handleCustomRequest}
-      onRemove={this.onRemove}>
-        <Button>
+      onRemove={this.onRemove}
+      accept="video/*">
+        {this.state.isUpload&&<Button>
           <UploadOutlined /> 上传视频
-        </Button>
+        </Button>}
       </Upload>
     );
   }

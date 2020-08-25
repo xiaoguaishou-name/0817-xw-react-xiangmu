@@ -17,7 +17,7 @@ import { logout } from "@redux/actions/login";
 import { resetUser } from "../../components/Authorized/redux";
 import logo from "@assets/images/logo.png";
 import { findPathIndex } from "@utils/tools";
-
+import { setIntl } from "@redux/actions/intl";
 // 引入组件公共样式
 import "@assets/css/common.less";
 import "./index.less";
@@ -27,10 +27,12 @@ const { Header, Sider, Content } = Layout;
 @connect(
   (state) => ({
     user: state.user,
+    intl: state.intl,
   }),
   {
     logout,
     resetUser,
+    setIntl,
   }
 )
 @withRouter
@@ -130,7 +132,12 @@ class PrimaryLayout extends Component {
       </Breadcrumb>
     );
   };
-
+  //点击切换国际化的回调
+  handleIntl = (options) =>{
+    console.log(options)
+    const key = options.key
+    this.props.setIntl(key)
+  }
   render() {
     const { collapsed } = this.state;
     const {
@@ -140,7 +147,12 @@ class PrimaryLayout extends Component {
     } = this.props;
 
     const route = this.selectRoute(routes, pathname);
-
+    const menu = (
+      <Menu selectedKeys={[this.props.intl]} onClick={this.handleIntl}>
+        <Menu.Item key="zh">中文</Menu.Item>
+        <Menu.Item key="en">English</Menu.Item>
+      </Menu>
+    );
     return (
       <Layout className="layout">
         <Sider trigger={null} collapsible collapsed={collapsed}>
@@ -169,9 +181,11 @@ class PrimaryLayout extends Component {
                     <span>{user.name}</span>
                   </span>
                 </Dropdown>
-                <span className="site-layout-lang">
-                  <GlobalOutlined />
-                </span>
+                <Dropdown overlay={menu}>
+                  <span className="site-layout-lang">
+                    <GlobalOutlined />
+                  </span>
+                </Dropdown>
               </span>
             </span>
           </Header>
