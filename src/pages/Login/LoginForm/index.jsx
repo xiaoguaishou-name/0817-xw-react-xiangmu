@@ -12,7 +12,7 @@ import {
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import { login } from "@redux/actions/login";
+import { login ,mobileLogin} from "@redux/actions/login";
 import {reqGetVerifyCode} from '@api/acl/oauth'
 
 import "./index.less";
@@ -23,18 +23,34 @@ const { TabPane } = Tabs;
 // @connect(null, {
 //   login,
 // })
+let tabFlag = 'user'
 function LoginForm (props) {
   const [form] = Form.useForm()
   let [countDown,setCountDown] = useState(5)
   let [isShowBtn,setIsShowBtn] = useState(true)
-  const onFinish = ({ username, password }) => {
-    props.login(username, password).then((token) => {
-      // 登录成功
-      // console.log("登陆成功~");
-      // 持久存储token
-      localStorage.setItem("user_token", token);
-      props.history.replace("/");
-    });
+  //点击登录按钮的回调
+  const onFinish = () => {
+    if(tabFlag === 'user'){
+      form.validateFields(['username','password']).then(res=>{
+        const { username, password } = res
+        props.login(username, password).then((token) => {
+        // 登录成功
+        // console.log("登陆成功~");
+        // 持久存储token
+        localStorage.setItem("user_token", token);
+        props.history.replace("/");
+        });
+      })  
+    }else{
+      form.validateFields(['phone','verify']).then(res=>{
+        const {phone,verify} = res
+        props.mobileLogin(phone,verify).then(token=>{
+          localStorage.setItem("user_token",token)
+          props.history.replace("/")
+        })
+      })
+    }
+    
     // .catch(error => {
     //   notification.error({
     //     message: "登录失败",
@@ -77,6 +93,13 @@ function LoginForm (props) {
 
     })
   }
+  const handleTabChange = (key) =>{
+    tabFlag = key
+  }
+  //第三方登陆的回调
+  const gitLogin = () =>{
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=618ca46bf80c8f7c7c52`
+  }
     return (
       <>
         <Form
@@ -84,12 +107,12 @@ function LoginForm (props) {
           name="normal_login"
           className="login-form"
           initialValues={{ remember: true }}
-          onFinish={onFinish}
+          // onFinish={onFinish}
         >
           <Tabs
             defaultActiveKey="user"
             tabBarStyle={{ display: "flex", justifyContent: "center" }}
-          >
+            onChange={handleTabChange}>
             <TabPane tab="账户密码登陆" key="user">
               <Form.Item name="username" rules={[
                 {
@@ -143,7 +166,16 @@ function LoginForm (props) {
 
               <Row justify="space-between">
                 <Col span={16}>
-                  <Form.Item name="verify">
+                  <Form.Item name="verify" rules={[
+                    {
+                      required:true,
+                      message:'请输入验证码'
+                    },
+                    {
+                      pattern:/^\d{6}$/,
+                      message:'您的验证码不正确'
+                    }
+                  ]}>
                     <Input
                       prefix={<MailOutlined className="form-icon" />}
                       placeholder="验证码"
@@ -171,8 +203,9 @@ function LoginForm (props) {
           <Form.Item>
             <Button
               type="primary"
-              htmlType="submit"
+              // htmlType="submit"
               className="login-form-button"
+              onClick={onFinish}
             >
               登陆
             </Button>
@@ -182,7 +215,7 @@ function LoginForm (props) {
               <Col span={16}>
                 <span>
                   其他登陆方式
-                  <GithubOutlined className="login-icon" />
+                  <GithubOutlined className="login-icon" onClick={gitLogin}/>
                   <WechatOutlined className="login-icon" />
                   <QqOutlined className="login-icon" />
                 </span>
@@ -197,4 +230,4 @@ function LoginForm (props) {
     );
 }
 
-export default withRouter(connect(null,{login})(LoginForm));
+export default withRouter(connect(null,{login,mobileLogin})(LoginForm));
