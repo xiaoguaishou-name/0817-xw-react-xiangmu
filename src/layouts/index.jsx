@@ -16,8 +16,8 @@ class BasicLayout extends Component {
       // 提供一个B组件渲染到A组件内部，并传入props
       return (
         <Authorized
-          render={(routes) => {
-            return <PrimaryLayout routes={routes} />;
+          render={(user) => {
+            return <PrimaryLayout routes={user} />;
           }}
         />
       );
